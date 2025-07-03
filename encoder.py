@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import re
+from sklearn.preprocessing import LabelEncoder
 
 BP_DIR = 'datapoints/BPfilter'
 META_PATH = 'datapoints/metadata.xlsx'
@@ -19,6 +20,18 @@ label_map = {
 
 rows = []
 srno = 1
+
+# Encoding for task labels
+label_encoding = {
+    'BEO': 0,
+    'CLH': 1,
+    'CRH': 2,
+    'DLF': 3,
+    'PLF': 4,
+    'DRF': 5,
+    'PRF': 6,
+    'Rest': 7,
+}
 
 def patient_sort_key(folder):
     match = re.match(r'f_S(\d+)', folder)
@@ -44,18 +57,19 @@ for patient_folder in sorted(os.listdir(BP_DIR), key=patient_sort_key):
             continue
         subj_id, rep_num, task_type, label_num, task_rep_num = match.groups()
         local_url = os.path.join(patient_path, file)
-        is_motor = 1 if task_type == 'M' else 0
-        is_imagery = 1 if task_type == 'I' else 0
+        # task_type: 1 for motor, 0 for imagery
+        task_type_val = 1 if task_type == 'M' else 0
         label_str = label_map.get(label_num, 'Unknown')
+        label_encoded = label_encoding.get(label_str, -1)
         rows.append([
             srno,
             patient_num,
             local_url,
             int(rep_num),
-            is_motor,
-            is_imagery,
+            task_type_val,
             int(task_rep_num),
-            label_str
+            label_str,
+            label_encoded
         ])
         srno += 1
 
@@ -65,10 +79,10 @@ columns = [
     'patient_number',
     'local_url',
     'repetition_number',
-    'is_motor_task',
-    'is_motor_imagery_task',
+    'task_type',
     'task_repetition_number',
-    'task_label'
+    'task_label',
+    'task_label_encoded'
 ]
 df = pd.DataFrame(rows, columns=columns)
 df.to_excel(META_PATH, index=False)
