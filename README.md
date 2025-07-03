@@ -12,3 +12,5 @@ Three prepatory codes have to run before the model compilation. These are to be 
 1) download_and_prepare: Downloads and unzips the dataset and structures the folder to prepare it for preprocessing. (requires internet access)
 2) bandpass: A required fitering that passes the data through a filter for frequencies of band 1.0Hz to 50Hz. It also preserves and negative values and the output of this code needs to be used to process in the ML mdoel.
 3) encoder: creates a metadata excel sheet that decodes the naming scheme of the excel sheets for ease of access during the training process. it also creates a column that points to the local url of each of the excel sheets and clearly marks the output labels.
+
+The folder training contains and codes of the models which were trained and the folder models contained saved models and history, done through joblib.
